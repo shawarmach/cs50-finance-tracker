@@ -1,4 +1,61 @@
 {% extends "layout.html" %}
-{% block content %}
-<p>Logged in successfully.</p>
+
+{% block title %}Dashboard{% endblock %}
+
+{% block main %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="brand-text text-dark">Willkommen zurück, {{ session.user_name if session.user_name else 'Dennis'
+                }}</h1>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="card h-100 text-center">
+                <small class="text-muted text-uppercase fw-bold" style="letter-spacing: 1px;">Kontostand</small>
+                <h2 class="display-6 fw-bold mt-2">1.250,50 €</h2>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 text-center border-start border-success border-4">
+                <small class="text-muted text-uppercase fw-bold" style="letter-spacing: 1px;">Einnahmen</small>
+                <h2 class="text-success mt-2">+ 3.000,00 €</h2>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 text-center border-start border-danger border-4">
+                <small class="text-muted text-uppercase fw-bold" style="letter-spacing: 1px;">Ausgaben</small>
+                <h2 class="text-danger mt-2">- 1.749,50 €</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="brand-text">Letzte Aktivitäten</h4>
+            <a href="/add" class="btn btn-primary btn-sm">+ Neue Ausgabe</a>
+        </div>
+
+        <table class="table table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>Datum</th>
+                    <th>Kategorie</th>
+                    <th>Beschreibung</th>
+                    <th class="text-end">Betrag</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>19.12.2025</td>
+                    <td><span class="badge bg-light text-dark">Essen</span></td>
+                    <td>Döner (Brombeer-Spezial)</td>
+                    <td class="text-end text-danger">- 7,50 €</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endblock %}
