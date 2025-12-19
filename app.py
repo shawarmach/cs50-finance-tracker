@@ -1,6 +1,8 @@
+import os
 from flask import Flask, render_template, request, redirect, session
 from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
+from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -24,21 +26,32 @@ def index():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    """Log user in"""
+
+    session.clear()
+
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
 
+        if not username or not password:
+            return "must provide username and password", 400
+
         db = get_db()
         cur = db.cursor()
-        cur.execute("SELECT id, hash FROM users WHERE username = ?", (username,))
-        row = cur.fetchone()
+        cur.execute("SELECT * FROM users WHERE username = ?", (username,))
+        user = cur.fetchone()
+        db.close()
 
-        if row and check_password_hash(row[1], password):
-            session["user_id"] = row[0]
-            return redirect("/")
-        return "Invalid credentials"
+        if user is None or not check_password_hash(user["hash"], password):
+            return "invalid username and/or password", 403
 
-    return render_template("login.html")
+        session["user_id"] = user["id"]
+
+        return redirect("/")
+    
+    else:
+        return render_template("login.html")
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -60,8 +73,48 @@ def register():
 
 @app.route("/logout")
 def logout():
+    """Log user out"""
+
     session.clear()
-    return redirect("/login")
+
+    return redirect("/")
+
+@app.route("/change_password", methods=["GET", "POST"])
+def change_password():
+    """Allow user to change their password"""
+    if "user_id" not in session:
+        return redirect("/login")
+
+    if request.method == "POST":
+        old_password = request.form.get("old_password")
+        new_password = request.form.get("new_password")
+        confirmation = request.form.get("confirmation")
+
+        if not old_password or not new_password or not confirmation:
+            return "must provide all fields", 400
+        
+        if new_password != confirmation:
+            return "new passwords do not match", 400
+
+        db = get_db()
+        cur = db.cursor()
+        
+        cur.execute("SELECT hash FROM users WHERE id = ?", (session["user_id"],))
+        user = cur.fetchone()
+
+        if not check_password_hash(user["hash"], old_password):
+            db.close()
+            return "incorrect old password", 403
+
+        new_hash = generate_password_hash(new_password)
+        cur.execute("UPDATE users SET hash = ? WHERE id = ?", (new_hash, session["user_id"]))
+        db.commit()
+        db.close()
+
+        return redirect("/")
+    
+    else:
+        return render_template("change_password.html")
 
 if __name__ == "__main__":
     app.run(debug=True)
