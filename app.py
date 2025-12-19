@@ -116,5 +116,34 @@ def change_password():
     else:
         return render_template("change_password.html")
 
+@app.route("/add", methods=["GET", "POST"])
+def add():
+    if "user_id" not in session:
+        return redirect("/login")
+
+    if request.method == "POST":
+        amount = request.form.get("amount")
+        category = request.form.get("category")
+        description = request.form.get("description")
+
+        if not amount or not category:
+            return "Must provide amount and category", 400
+
+        db = get_db()
+        cur = db.cursor()
+        
+        cur.execute(
+            "INSERT INTO transactions (user_id, amount, category, description) VALUES (?, ?, ?, ?)",
+            (session["user_id"], amount, category, description)
+        )
+        
+        db.commit()
+        db.close()
+
+        return redirect("/")
+
+    else:
+        return render_template("add.html")
+
 if __name__ == "__main__":
     app.run(debug=True)
