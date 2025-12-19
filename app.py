@@ -2,11 +2,19 @@ from flask import Flask, render_template, request, redirect, session
 from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
 
+load_dotenv()
+
 app = Flask(__name__)
-app.secret_key = "dev-secret"
+
+app.secret_key = os.getenv("FLASK_SECRET_KEY")
+
+if not app.secret_key:
+    raise ValueError("No FLASK_SECRET_KEY found! Did you create the .env file?")
 
 def get_db():
-    return sqlite3.connect("finance.db")
+    db = sqlite3.connect("finance.db")
+    db.row_factory = sqlite3.Row
+    return db
 
 @app.route("/")
 def index():
