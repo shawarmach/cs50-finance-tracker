@@ -78,8 +78,15 @@ def login():
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
+        first_name = request.form.get("first_name")
         username = request.form.get("username")
         password = request.form.get("password")
+        confirmation = request.form.get("confirmation")
+
+        if not first_name or not username or not password or not confirmation:
+            return "must provide all fields", 400
+        if password != confirmation:
+            return "passwords do not match", 400
 
         hash_pw = generate_password_hash(password)
         db = get_db()
