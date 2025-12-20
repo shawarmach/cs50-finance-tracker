@@ -1,8 +1,32 @@
 {% extends "layout.html" %}
-{% block content %}
-<form method="post">
-    <input name="username" placeholder="Username">
-    <input name="password" type="password" placeholder="Password">
-    <button class="btn btn-primary w-100" type="submit">Register</button>
-</form>
+
+{% block title %}Register{% endblock %}
+
+{% block main %}
+<div class="container d-flex justify-content-center">
+    <div class="card shadow-sm p-4" style="max-width: 400px; width: 100%;">
+        <div class="text-center mb-4">
+            <h2 class="brand-text">Create Account</h2>
+            <p class="text-muted small">Join the Raccoon Club</p>
+        </div>
+
+        <form action="/register" method="post">
+            <div class="mb-3">
+                <input autocomplete="off" class="form-control" name="username" placeholder="Username" type="text"
+                    required>
+            </div>
+            <div class="mb-3">
+                <input class="form-control" name="password" placeholder="Password" type="password" required>
+            </div>
+            <div class="mb-3">
+                <input class="form-control" name="confirmation" placeholder="Confirm Password" type="password" required>
+            </div>
+            <button class="btn btn-primary w-100" type="submit">Register</button>
+        </form>
+
+        <div class="text-center mt-3">
+            <small>Already have an account? <a href="/login">Log In</a></small>
+        </div>
+    </div>
+</div>
 {% endblock %}

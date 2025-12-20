@@ -22,7 +22,29 @@ def get_db():
 def index():
     if "user_id" not in session:
         return redirect("/login")
-    return render_template("index.html")
+
+    db = get_db()
+    cur = db.cursor()
+
+    # 1. Alle Transaktionen des Users holen
+    cur.execute("SELECT * FROM transactions WHERE user_id = ? ORDER BY date DESC", (session["user_id"],))
+    transactions = cur.fetchall()
+
+    # 2. Summen berechnen
+    total_incomes = 0
+    total_expenses = 0
+
+    for row in transactions:
+        if row["amount"] > 0:
+            total_incomes += row["amount"]
+        else:
+            total_expenses += abs(row["amount"])
+
+    balance = total_incomes - total_expenses
+    
+    db.close()
+
+    return render_template("index.html", transactions=transactions,balance=balance, total_incomes=total_incomes, total_expenses=total_expenses)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():

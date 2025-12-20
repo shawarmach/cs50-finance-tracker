@@ -6,54 +6,62 @@
 <div class="container">
     <div class="row mb-4">
         <div class="col-12">
-            <h1 class="brand-text text-dark">Willkommen zurück, {{ session.user_name if session.user_name else 'Dennis'
-                }}</h1>
+            <h1 class="brand-text text-dark">Welcome back, {{ session.user_name if session.user_name else 'Dennis' }}
+            </h1>
         </div>
     </div>
 
     <div class="row g-4 mb-5">
         <div class="col-md-4">
             <div class="card h-100 text-center">
-                <small class="text-muted text-uppercase fw-bold" style="letter-spacing: 1px;">Kontostand</small>
-                <h2 class="display-6 fw-bold mt-2">1.250,50 €</h2>
+                <small class="text-muted text-uppercase fw-bold" style="letter-spacing: 1px;">Balance</small>
+                <h2 class="display-6 fw-bold mt-2">{{ "%.2f"|format(balance) }} €</h2>
             </div>
         </div>
         <div class="col-md-4">
             <div class="card h-100 text-center border-start border-success border-4">
-                <small class="text-muted text-uppercase fw-bold" style="letter-spacing: 1px;">Einnahmen</small>
-                <h2 class="text-success mt-2">+ 3.000,00 €</h2>
+                <small class="text-muted text-uppercase fw-bold" style="letter-spacing: 1px;">Incomes</small>
+                <h2 class="text-success mt-2">+ {{ "%.2f"|format(total_incomes) }} €</h2>
             </div>
         </div>
         <div class="col-md-4">
             <div class="card h-100 text-center border-start border-danger border-4">
-                <small class="text-muted text-uppercase fw-bold" style="letter-spacing: 1px;">Ausgaben</small>
-                <h2 class="text-danger mt-2">- 1.749,50 €</h2>
+                <small class="text-muted text-uppercase fw-bold" style="letter-spacing: 1px;">Expenses</small>
+                <h2 class="text-danger mt-2">- {{ "%.2f"|format(total_expenses) }} €</h2>
             </div>
         </div>
     </div>
 
     <div class="card">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h4 class="brand-text">Letzte Aktivitäten</h4>
-            <a href="/add" class="btn btn-primary btn-sm">+ Neue Ausgabe</a>
+            <h4 class="brand-text">Recent Activity</h4>
+            <a href="/add" class="btn btn-primary btn-sm">+ New Entry</a>
         </div>
 
         <table class="table table-hover">
             <thead class="table-light">
                 <tr>
-                    <th>Datum</th>
-                    <th>Kategorie</th>
-                    <th>Beschreibung</th>
-                    <th class="text-end">Betrag</th>
+                    <th>Date</th>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th class="text-end">Amount</th>
                 </tr>
             </thead>
             <tbody>
+                {% for row in transactions %}
                 <tr>
-                    <td>19.12.2025</td>
-                    <td><span class="badge bg-light text-dark">Essen</span></td>
-                    <td>Döner (Brombeer-Spezial)</td>
-                    <td class="text-end text-danger">- 7,50 €</td>
+                    <td>{{ row.date }}</td>
+                    <td><span class="badge bg-light text-dark">{{ row.category }}</span></td>
+                    <td>{{ row.description }}</td>
+                    <td class="text-end {{ 'text-danger' if row.amount < 0 else 'text-success' }}">
+                        {{ "%.2f"|format(row.amount) }} €
+                    </td>
                 </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" class="text-center text-muted">No transactions found. Start by adding one!</td>
+                </tr>
+                {% endfor %}
             </tbody>
         </table>
     </div>
