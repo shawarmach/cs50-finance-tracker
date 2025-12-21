@@ -1,3 +1,12 @@
+"""
+CS50 Final Project – Personal Finance Tracker
+
+Note:
+AI-based tools were used for UI design brainstorming and for help
+understanding certain error messages. All application logic,
+database design, and implementation decisions were made by me.
+"""
+
 import os
 from flask import Flask, render_template, request, redirect, session
 from werkzeug.security import generate_password_hash, check_password_hash
