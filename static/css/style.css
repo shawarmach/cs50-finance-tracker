@@ -119,3 +119,67 @@ body {
 .duck-credit:hover .duck-emoji {
     transform: scale(1.6) rotate(-15deg);
 }
+
+.table {
+    border-collapse: separate;
+    border-spacing: 0 0.5rem;
+    /* Erzeugt einen leichten Abstand zwischen Zeilen */
+}
+
+.table thead th {
+    border-bottom: 2px solid #f8f9fa;
+    color: #6c757d;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    padding: 1rem;
+}
+
+.table tbody td {
+    padding: 1rem;
+    vertical-align: middle;
+    background-color: transparent;
+    border-top: 1px solid #f8f9fa;
+}
+
+/* Badge für Kategorien */
+.badge {
+    padding: 0.5em 0.8em;
+    font-weight: 500;
+    border-radius: 6px;
+}
+
+/* Hover Effekt für Zeilen */
+.table-hover tbody tr:hover {
+    background-color: #fcfcfc;
+    transition: background-color 0.2s ease;
+}
+
+/* Farben für Beträge */
+.text-success {
+    color: #28a745 !important;
+    font-weight: 600;
+}
+
+.text-danger {
+    color: #dc3545 !important;
+    font-weight: 600;
+}
+
+.btn-remove-link {
+    background: none;
+    border: none;
+    color: #adb5bd;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-remove-link:hover {
+    color: #000;
+    text-decoration: underline;
+}

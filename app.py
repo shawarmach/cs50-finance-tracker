@@ -26,11 +26,9 @@ def index():
     db = get_db()
     cur = db.cursor()
 
-    # 1. Alle Transaktionen des Users holen
     cur.execute("SELECT * FROM transactions WHERE user_id = ? ORDER BY date DESC", (session["user_id"],))
     transactions = cur.fetchall()
 
-    # 2. Summen berechnen
     total_incomes = 0
     total_expenses = 0
 
@@ -69,7 +67,7 @@ def login():
             return "invalid username and/or password", 403
 
         session["user_id"] = user["id"]
-
+        session["first_name"] = user["first_name"]
         return redirect("/")
     
     else:
@@ -91,11 +89,18 @@ def register():
         hash_pw = generate_password_hash(password)
         db = get_db()
         cur = db.cursor()
-        cur.execute(
-            "INSERT INTO users (username, hash) VALUES (?, ?)",
-            (username, hash_pw)
-        )
-        db.commit()
+        
+        try:
+            cur.execute(
+                "INSERT INTO users (username, hash, first_name) VALUES (?, ?, ?)",
+                (username, hash_pw, first_name)
+            )
+            db.commit()
+        except sqlite3.IntegrityError:
+            db.close()
+            return "username already exists", 400
+            
+        db.close()
         return redirect("/login")
 
     return render_template("register.html")
@@ -106,7 +111,7 @@ def logout():
 
     session.clear()
 
-    return redirect("/")
+    return redirect("/login")
 
 @app.route("/change_password", methods=["GET", "POST"])
 def change_password():
@@ -158,21 +163,55 @@ def add():
         if not amount or not category:
             return "Must provide amount and category", 400
 
+        try:
+            amount_val = float(amount.replace(',', '.'))
+        except ValueError:
+            return "Invalid amount format", 400
+
         db = get_db()
         cur = db.cursor()
-        
         cur.execute(
             "INSERT INTO transactions (user_id, amount, category, description) VALUES (?, ?, ?, ?)",
-            (session["user_id"], amount, category, description)
+            (session["user_id"], amount_val, category, description)
         )
-        
         db.commit()
         db.close()
 
         return redirect("/")
-
     else:
         return render_template("add.html")
+    
+@app.route("/history")
+def history():
+    if "user_id" not in session:
+        return redirect("/login")
+    
+    db = get_db()
+    cur = db.cursor()
+    cur.execute("SELECT * FROM transactions WHERE user_id = ? ORDER BY date DESC", (session["user_id"],))
+    transactions = cur.fetchall()
+    db.close()
+    
+    return render_template("history.html", transactions=transactions)
+
+@app.route("/delete", methods=["POST"])
+def delete():
+    if "user_id" not in session:
+        return redirect("/login")
+    
+    transaction_id = request.form.get("id")
+    
+    if transaction_id:
+        db = get_db()
+        cur = db.cursor()
+        
+        cur.execute("DELETE FROM transactions WHERE id = ? AND user_id = ?", 
+                    (transaction_id, session["user_id"]))
+        
+        db.commit()
+        db.close()
+        
+    return redirect("/history")
 
 if __name__ == "__main__":
     app.run(debug=True)
